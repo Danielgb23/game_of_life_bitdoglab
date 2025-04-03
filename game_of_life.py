@@ -154,18 +154,23 @@ buzzer.duty_u16(0)
 
 # Notas musicais (frequências em Hz)
 NOTES = {
+    "C4": 261,
+    "D4": 294,
+    "E4": 330,
     "F4": 349,
+    "G4": 392,
     "A4": 440,
     "B4": 494,
-    "E5": 659,
-    "D5": 587,
     "C5": 523,
-    "G4": 392,
-    "E4": 330,
-    "D4": 294,
+    "D5": 587,
+    "E5": 659,
+    "F5": 698,
+    "G5": 784,
+    "A5": 880,
+    "B5": 988
 }
 
-# Melodia corrigida de "Saria's Song"
+# Melodia do jogo zelda
 melody = [
     ("F4", 300),("A4", 300),("B4", 600),
     ("F4", 300),("A4", 300),("B4", 600),
@@ -182,6 +187,29 @@ melody = [
     (None, 300),
     ("B4", 300),("G4", 300),("D4", 300),("E4", 1400),
     (None, 300),
+    
+    ("D4", 300), ("E4", 300), ("F4", 600),
+    ("G4", 300), ("A4", 300), ("B4", 600),
+    ("C5", 300), ("B4", 300), ("E4", 1200),
+    (None, 300),
+    ("F4", 300), ("G4", 300), ("A4", 600),
+    ("B4", 300), ("C5", 300), ("D5", 600),
+    ("E5", 300), ("F5", 300), ("G5", 1200),
+    (None, 300),
+    ("D4", 300), ("E4", 300), ("F4", 600),
+    ("G4", 300), ("A4", 300), ("B4", 600),
+    ("C5", 300), ("B4", 300), ("E4", 1200),
+    (None, 300),
+    ("F4", 300), ("E4", 300),
+    ("A4", 300), ("G4", 300),
+    ("B4", 300), ("A4", 300),
+    ("C5", 300), ("B4", 300),
+    ("D5", 300), ("C5", 300),
+    ("E5", 300), ("D5", 300),
+    ("F5", 300), ("E5", 600),
+    (None, 100),
+    ("E5", 300), ("F5", 200), ("D5", 300), ("E5", 1400),
+    (None, 300),
 ]
 
 melody_index = 0
@@ -193,12 +221,15 @@ def play_next_note(timer):
     if not set_game:
         note, duration = melody[melody_index]
         if note is None:
-            buzzer.duty_u16(0)  # silencio
+            buzzer.duty_u16(0)  # Silencio
         else:
-            buzzer.freq(NOTES[note])
+            buzzer.freq(NOTES[note]) # Frequencia da nota
             buzzer.duty_u16(512)  # Define volume
+            
+        # incrementa a nota da melodia
         melody_index += 1
         melody_index %= len(melody)
+        
         melody_timer.init(period=duration, mode=Timer.ONE_SHOT, callback=play_next_note)
     else:
         buzzer.duty_u16(0)  # Desliga
@@ -209,7 +240,7 @@ melody_timer = Timer()
 
 
 ############################
-
+debounce_timer = Timer()
 
 # Funções de interrupção dos botões
 def button_a_pressed(pin):
@@ -229,14 +260,25 @@ def button_b_pressed(pin):
     # Laço para debouncing
     if deb_b == 0:
         deb_b = 1
+        if cell_matrix[y][x]:
+            buzzer.freq(NOTES["A4"])
+        else:
+            buzzer.freq(NOTES["C4"])
+        buzzer.duty_u16(512)
         # Inverte o estado da célula sob o cursor
-        cell_matrix[y][x] = not cell_matrix[y][x]
-
-    # Para debouncing
-    utime.sleep(0.2)
-    deb_b = 0
-
-
+        cell_matrix[y][x] = not cell_matrix[y][x]        
+        # Para debouncing
+        utime.sleep(0.2)
+        buzzer.duty_u16(0)
+        #timer que poem zero na variavel de debouncing depois de 200us
+        debounce_timer.init(mode=Timer.ONE_SHOT, period=200, callback=debounce_callback_b)
+        
+# Função chamada após o tempo de debounce
+def debounce_callback_b(timer):
+    global deb_b
+    if deb_b == 1:
+        deb_b = 0
+            
 # Interrupção botões
 button_a.irq(trigger=Pin.IRQ_FALLING, handler=button_a_pressed)
 button_b.irq(trigger=Pin.IRQ_FALLING, handler=button_b_pressed)
@@ -307,3 +349,4 @@ while True:
     # Reseta a tela do jogo da vida
     grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
     draw_oled()
+
