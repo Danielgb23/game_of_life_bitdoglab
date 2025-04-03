@@ -292,4 +292,5 @@ while True:
     deb_a = 0
     # Reseta a tela do jogo da vida
     grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
-    d
+    draw_oled()
+
