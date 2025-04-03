@@ -12,14 +12,14 @@ import utime
 from ssd1306 import SSD1306_I2C
 
 
-# Configuração do OLED
+# Configuração do OLED e grid do jogo #############################
+
 i2c = SoftI2C(scl=Pin(15), sda=Pin(14))
 oled = SSD1306_I2C(128, 64, i2c)
 
 
 # Define a grid da tela OLED onde vai ser rodado o jogo da vida
 # Definição do tamanho do tabuleiro
-#
 WIDTH = 128
 HEIGHT = 64
 
@@ -38,6 +38,8 @@ def draw_oled():
                 oled.fill_rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE, 1)
     oled.show()
 
+
+# Regras do jogo da vida ################################
 
 # contabiliza os vizinhos para aplicar as regras do jogo na grid
 def count_neighbors(x, y):
@@ -66,23 +68,8 @@ def game_of_life_step():
     grid = new_grid
 
 
-######################################
 
-# Configuração do joystick
-VRx = ADC(Pin(27))  # Eixo X
-VRy = ADC(Pin(26))  # Eixo Y
-
-# Configuração dos botoes
-button_a = Pin(5, Pin.IN, Pin.PULL_UP)
-button_b = Pin(6, Pin.IN, Pin.PULL_UP)
-
-# Variável que define o estado de preencher o canvas da matriz de LEDs
-set_game = True
-
-
-
-
-### matriz de leds##################
+### Matriz de leds e joystick ##################
 
 # Configuração da matriz de LEDs
 NUM_LEDS = 25
@@ -122,14 +109,28 @@ def update_matrix():
 
     np.write()
 
+# Configuração do joystick 
+VRx = ADC(Pin(27))  # Eixo X
+VRy = ADC(Pin(26))  # Eixo Y
 
-#### clapper#########################3
+
+# Inicializa estado das células na matriz de LEDs (False = morta)
+cell_matrix = [[False for _ in range(5)] for _ in range(5)]
+
+# Inicializa matriz de LEDs
+np.fill((0, 0, 0))  # Apaga todos os LEDs
+np[LED_MATRIX[y][x]] = cursor_dead  # Acende o LED do cursor com a cor atual
+np.write()
+
+
+#### clapper #########################3
 
 # Configuração do microfone (ADC no GPIO28)
 microphone = ADC(Pin(28))  # O microfone está conectado ao GPIO28
 
 
 # Função do clapper (detecção de som)
+# que limpa as celulas vivas da matriz de LEDs
 def detect_clap():
     global sound_level
     global cell_matrix
@@ -143,7 +144,7 @@ def detect_clap():
         cell_matrix = [[False for _ in range(5)] for _ in range(5)]
 
 
-# musica do jogo #########
+# musica do jogo #######################
 
 # Configuração do buzzer
 buzzer = PWM(Pin(21))  # Buzzer conectado ao GPIO8
@@ -238,7 +239,14 @@ def play_next_note(timer):
 melody_timer = Timer()
 
 
-############################
+
+# Configuração dos botoes ############################
+button_a = Pin(5, Pin.IN, Pin.PULL_UP)
+button_b = Pin(6, Pin.IN, Pin.PULL_UP)
+
+
+# Variável que define o estado de preencher o canvas da matriz de LEDs
+set_game = True
 
 # Variáveis de debouncing
 deb_a = False
@@ -287,19 +295,12 @@ button_a.irq(trigger=Pin.IRQ_FALLING, handler=button_a_pressed)
 button_b.irq(trigger=Pin.IRQ_FALLING, handler=button_b_pressed)
 
 
-# Inicializa estado das células na matriz de LEDs (False = morta)
-cell_matrix = [[False for _ in range(5)] for _ in range(5)]
-
-# Inicializa matriz de LEDs
-np.fill((0, 0, 0))  # Apaga todos os LEDs
-np[LED_MATRIX[y][x]] = cursor_dead  # Acende o LED do cursor com a cor atual
-np.write()
 
 
-# Loop principal
+# Loop principal #################################
 while True:
 
-    # Loop da matriz de LEDs
+    # Loop da matriz de LEDs para selecionar as celulas #############
     while set_game:
         # Leitura do joystick
         vx = VRx.read_u16()
@@ -309,13 +310,13 @@ while True:
         sound_level = microphone.read_u16()
         print(sound_level)
 
-        # Movimento horizontal
+        # Movimento horizontal joystick
         if vx > 45000 and x < 4:
             x += 1
         elif vx < 20000 and x > 0:
             x -= 1
 
-        # Movimento vertical
+        # Movimento vertical joystick
         if vy > 45000 and y > 0:
             y -= 1
         elif vy < 20000 and y < 4:
@@ -325,28 +326,30 @@ while True:
         utime.sleep(0.2)
         detect_clap()
 
-    # Preenche a grid com o jogo
+    # Preenche a grid para o OLED com o as celulas do usuario da matriz
     for i in range(5):
         for j in range(5):
             grid[GRID_HEIGHT // 2 - 2 + j][GRID_WIDTH // 2 - 2 + i] = cell_matrix[j][i]
     update_matrix()
-
-    utime.sleep(0.4)
-
+    
     # Debouncing
+    utime.sleep(0.4)
     deb_a = False
 
-    # to play the song
+    # Para comecar a tocar a musica
     melody_index = 0
     play_next_note(melody_timer)
-
+    
+    # Loop do jogo da vida no display OLED #################
     while not set_game:
         draw_oled()
         utime.sleep(0.5)
         game_of_life_step()
 
+    # Debouncing
     utime.sleep(0.4)
     deb_a = False
+    
     # Reseta a tela do jogo da vida
     grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
     draw_oled()
