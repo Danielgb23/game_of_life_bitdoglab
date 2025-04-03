@@ -80,9 +80,7 @@ button_b = Pin(6, Pin.IN, Pin.PULL_UP)
 set_game = True
 
 
-# Variáveis de debouncing
-deb_a = 0
-deb_b = 0
+
 
 ### matriz de leds##################
 
@@ -241,6 +239,11 @@ melody_timer = Timer()
 
 
 ############################
+
+# Variáveis de debouncing
+deb_a = False
+deb_b = False
+
 debounce_timer = Timer()
 
 # Funções de interrupção dos botões
@@ -248,10 +251,10 @@ def button_a_pressed(pin):
     global set_game
     global deb_a
     # Laço para debouncing
-    if deb_a == 0:
+    if not deb_a:
         # Inverte o estado do jogo (de setar as células para rodar o jogo e vice-versa)
         set_game = not set_game
-        deb_a = 1
+        deb_a = True
     # Para debouncing
     utime.sleep(0.2)
 
@@ -259,8 +262,8 @@ def button_a_pressed(pin):
 def button_b_pressed(pin):
     global deb_b
     # Laço para debouncing
-    if deb_b == 0:
-        deb_b = 1
+    if not deb_b:
+        deb_b = True
         if cell_matrix[y][x]:
             buzzer.freq(NOTES["A4"])
         else:
@@ -277,8 +280,7 @@ def button_b_pressed(pin):
 # Função chamada após o tempo de debounce
 def debounce_callback_b(timer):
     global deb_b
-    if deb_b == 1:
-        deb_b = 0
+    deb_b = False
             
 # Interrupção botões
 button_a.irq(trigger=Pin.IRQ_FALLING, handler=button_a_pressed)
@@ -293,9 +295,7 @@ np.fill((0, 0, 0))  # Apaga todos os LEDs
 np[LED_MATRIX[y][x]] = cursor_dead  # Acende o LED do cursor com a cor atual
 np.write()
 
-# inicializa variaveis debouncing
-deb_a = 0
-deb_b = 0
+
 # Loop principal
 while True:
 
@@ -334,7 +334,7 @@ while True:
     utime.sleep(0.4)
 
     # Debouncing
-    deb_a = 0
+    deb_a = False
 
     # to play the song
     melody_index = 0
@@ -346,7 +346,7 @@ while True:
         game_of_life_step()
 
     utime.sleep(0.4)
-    deb_a = 0
+    deb_a = False
     # Reseta a tela do jogo da vida
     grid = [[0 for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
     draw_oled()
