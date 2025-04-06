@@ -36,11 +36,7 @@ Demonstrar as funcionalidades da placa BitDogLab por meio de um jogo, nos prepar
    ```sh
    cd game_of_life_bitdoglab
    ```
-3. Instale as dependências:
-   ```sh
-   pip install -r requirements.txt
-   ```
-4. Execute o projeto:
+3. Execute o projeto:
    ```sh
    python main.py
    ```
