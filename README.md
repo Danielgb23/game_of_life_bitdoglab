@@ -48,8 +48,6 @@ Demonstrar as funcionalidades da placa BitDogLab por meio de um jogo, nos prepar
 ## Estrutura do Projeto
 - `main.py`: Arquivo principal para execução do jogo.
 - `game_of_life.py`: Contém a lógica do autômato celular.
-- `utils/`: Contém funções utilitárias.
-- `tests/`: Contém testes unitários.
 
 ## Resultados Esperados
 Um exemplo funcional e prático do Jogo da Vida em uma grade limitada de 128x64. As células vivas (acesas) inseridas pelo usuário na matriz de LEDs devem evoluir de acordo com as regras do jogo.
