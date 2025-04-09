@@ -32,32 +32,20 @@ Demonstrar as funcionalidades da placa BitDogLab por meio de um jogo, nos prepar
    ```sh
    git clone https://github.com/Danielgb23/game_of_life_bitdoglab.git
    ```
-2. Navegue até o diretório do projeto:
-   ```sh
-   cd game_of_life_bitdoglab
-   ```
-3. Execute o projeto:
-   ```sh
-   python main.py
-   ```
+2. Navegue até o diretório do projeto.
+3. Prepare uma IDE (thonny ou VS code) e a placa bitdoglab com o guia [aqui](https://bitdoglab.webcontent.website/cursos/introducao-pratica-a-bitdoglab/aulas/usando-o-ide-thonny-para-desenvolvimento/)
+   
+4. Execute o projeto com a placa bitgodlab devidamente configurada e conectada ao computador.
 
 ## Estrutura do Projeto
-- `main.py`: Arquivo principal para execução do jogo.
-- `game_of_life.py`: Contém a lógica do autômato celular.
+- `game_of_life.py`: Contém toda a lógica do projeto.
 
 ## Resultados Esperados
 Um exemplo funcional e prático do Jogo da Vida em uma grade limitada de 128x64. As células vivas (acesas) inseridas pelo usuário na matriz de LEDs devem evoluir de acordo com as regras do jogo.
 
 ## Vídeo
-Para uma visão geral do projeto, assista ao vídeo: [Link para o Vídeo](https://youtu.be/jUXryB5bY1Y)
+Para uma demonstração do projeto, assista ao vídeo: [Link para o Vídeo](https://youtu.be/jUXryB5bY1Y)
 
-## Contribuição
-Contribuições são bem-vindas! Para contribuir, siga os passos abaixo:
-1. Faça um fork do projeto.
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`).
-3. Faça commit das suas alterações (`git commit -m 'Adiciona nova feature'`).
-4. Faça push para a branch (`git push origin feature/nova-feature`).
-5. Abra um Pull Request.
 
 ## Licença
 Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
