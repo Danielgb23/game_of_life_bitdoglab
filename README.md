@@ -26,6 +26,8 @@ Demonstrar as funcionalidades da placa BitDogLab por meio de um jogo, nos prepar
 - Display OLED
 - Botão A
 - Botão B
+- Microfone
+- Buzzer
 
 ## Como Executar o Projeto
 1. Clone o repositório:
